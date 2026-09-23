@@ -1,0 +1,6 @@
+# Dependências para reproduzir e reexecutar o notebook didático
+jupyter
+ipykernel
+nbformat
+nbclient
+nbconvert
