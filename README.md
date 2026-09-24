@@ -1,6 +1,14 @@
 # Engenharia-de-dados---Ovitrampas
 # ETL Ovitrampas – Recife 2026
 
+## EQUIPE:
+- PEDRO PEREIRA
+- LUCAS OLIVEIRA
+- BRENO NEVES
+- MATEUS TARCISIO
+- MATHEUS ALEXANDRE
+- RAFAEL DE BRITO
+
 Pipeline ETL + notebook didático para **tratar e analisar os dados de monitoramento de ovitrampas (armadilhas de dengue) do Recife em 2026**, carregando o resultado em **SQLite** e, opcionalmente, no **MongoDB Atlas**.
 
 ## 1. Fonte de dados
