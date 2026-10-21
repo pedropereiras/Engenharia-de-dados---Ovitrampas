@@ -1,13 +1,4 @@
-# Engenharia-de-dados---Ovitrampas
 # ETL Ovitrampas – Recife 2026
-
-## EQUIPE:
-- PEDRO PEREIRA
-- LUCAS OLIVEIRA
-- BRENO NEVES
-- MATEUS TARCISIO
-- MATHEUS ALEXANDRE
-- RAFAEL DE BRITO
 
 Pipeline ETL + notebook didático para **tratar e analisar os dados de monitoramento de ovitrampas (armadilhas de dengue) do Recife em 2026**, carregando o resultado em **SQLite** e, opcionalmente, no **MongoDB Atlas**.
 
@@ -32,9 +23,12 @@ O dataset conta com **31.455 registros × 17 colunas** cobrindo **12 ciclos** de
 │   ├── transform.py         # limpeza, tratamento e organização em tabelas
 │   ├── database.py          # schema (DDL) do SQLite
 │   ├── load.py              # carga das tabelas no SQLite
+│   ├── load_neon.py         # carga das tabelas no Neon (Postgres)
 │   ├── main.py              # executa o pipeline completo
-│   └── carregar_mongodb.py  # carga opcional no MongoDB Atlas
-├── .env                     # MONGODB_URI (não versionado)
+│   ├── carregar_mongodb.py  # carga opcional no MongoDB Atlas
+│   └── exportar_csv.py      # exporta o dado tratado para CSV
+├── carregar_neon.py         # ponto de entrada da carga no Neon
+├── .env                     # MONGODB_URI / DATABASE_URL (não versionado)
 ├── requirements.txt         # dependências do pipeline
 └── requirements-dev.txt     # dependências do notebook
 ```
@@ -77,6 +71,35 @@ Execute com **Kernel → Restart & Run All**. As células reproduzem todo o trat
    ```
 
    Recria a coleção `monitoramento` do banco `ovitrampas` com os 31.455 documentos (datas como `datetime`, numéricos inteiros). Execute novamente sempre que quiser reenviar o dado já limpo.
+
+### 3.4 Neon (Postgres) — opcional
+
+Carga das tabelas tratadas (dimensões + fato) em um banco relacional Neon via SQLAlchemy.
+
+1. Crie um projeto no [Neon](https://neon.tech) e copie a `DATABASE_URL` (connection string PostgreSQL).
+2. Adicione ao `.env` (na raiz):
+
+   ```
+   DATABASE_URL=postgresql://usuario:senha@ep-xxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+   ```
+
+3. Instale as dependências e execute a carga (usa o `banco/ovitrampas.db` já gerado):
+
+   ```bash
+   pip install -r requirements.txt
+   python src/main.py          # gera o SQLite tratado (se ainda não existir)
+   python carregar_neon.py     # envia as tabelas para o Neon
+   ```
+
+   O script cria/substitui as tabelas `distrito_sanitario`, `bairro`, `agente`, `ovitrampa`, `tecnico_laboratorio`, `observacao` e `monitoramento_ovitrampa` no Neon (mesmo modelo dimensional do SQLite).
+
+> **Windows (Smart App Control):** o Windows 11 pode bloquear as extensões C (`*.pyd`) do
+> SQLAlchemy com o erro `DLL load failed while importing _processors_cy / _row_cy`. Caso ocorra,
+> remova os binários compilados para forçar o fallback em Python puro:
+>
+> ```powershell
+> Get-ChildItem -Recurse .venv\Lib\site-packages\sqlalchemy -Include *.pyd | Remove-Item -Force
+> ```
 
 ## 4. Etapas de tratamento e limpeza
 
@@ -132,4 +155,4 @@ O dado bruto tem padrões esperados de um registro operacional que **não são "
 
 ## 7. Tecnologias
 
-Python 3.14, pandas 3.0.5, openpyxl, SQLite (stdlib), pymongo, Jupyter.
+Python 3.14, pandas 3.0.5, openpyxl, SQLite (stdlib), pandas + SQLAlchemy + psycopg (Neon/Postgres), pymongo, Jupyter.

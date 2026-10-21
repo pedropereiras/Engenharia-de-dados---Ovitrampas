@@ -1,0 +1,7 @@
+jupyter
+ipykernel
+nbformat
+nbclient
+nbconvert
+sqlalchemy
+psycopg[binary]
